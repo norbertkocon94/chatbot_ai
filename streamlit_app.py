@@ -1,0 +1,163 @@
+import streamlit as st
+from openai import OpenAI
+from ai_config import *
+
+# Set the title and header
+st.set_page_config(page_title="Językowy AI Czat 💬")
+st.markdown("<h1><center>Językowy AI Czat 💬</center></h1>", unsafe_allow_html=True)
+st.sidebar.markdown("<h1><center>Językowy AI Czat 💬</center></h1>", unsafe_allow_html=True)
+
+# Containers for questions, images and buttons.
+with st.sidebar:
+     language_answer    = st.selectbox("Pytanie 1: Jakiego jezyka chcesz sie uczyć?", ("Angielski", "Francuski", "Włoski"))
+     level_answer       = st.selectbox("Pytanie 2: Jaki jest twoj poziom?", ("Podstawowy - A1/A2", "Sredniozaawansowany - B1/B2", "Zaawansowany - C1/C2"))
+     time_answer        = st.selectbox("Pytanie 3: Ile chcesz poświęcić dziennie na naukę?", ("5min", "10min", "15min"))
+     tutor_style        = st.selectbox("Pytanie 4: Wybierz swojego tutora.", ("Kolega", "Przyjaciółka", "Profesor"))
+     tutor_name         = st.text_input("Pytanie 5 Jak na imię ma twój nauczyciel?")
+     llm_model          = st.selectbox("Wybierz model GPT.", ("GPT 3.5", "GPT 4", "Llama 2"))
+
+     if llm_model == 'Llama 2':
+          st.info("Model **Llama 2** - Open source model by Meta (Facebook). Link: https://ai.meta.com/llama/", icon="ℹ️")
+     else:
+          OPENAI_APIKEY = st.text_input("Wprowadź swój klucz API.", help="Klucz API jest wymagany do korzystania z Językowego AI Czatu.", type="password")
+
+     tutor_image        = st.file_uploader("Wybierz zdjęcie swojego nauczyciela.", type=["png", "jpg", "jpeg"])
+     
+     col1, col2 = st.columns(2)
+     with col1:
+        confirm_button  = st.button("Zatwierdź", use_container_width=True, type='primary')
+     with col2:
+        reset_button    = st.button("Resetuj", use_container_width=True)
+
+# Expander for more information.
+with st.expander(':rainbow[Witaj w Językowym AI Czacie! Rozwiń więcej informacji, aby poznać wszystkie szczegóły.]', expanded=False):
+     st.info('Zwróć uwagę, że w tym momencie dostępne są tylko trzy języki: angielski, francuski i włoski.', icon="ℹ️")
+     st.error('''Pamiętaj, że korzystanie z Językowego AI Czatu jest **płatne**. Cennik dostępny jest na stronie głównej OpenAI. Link: https://platform.openai.com/overview.''', icon="🚨")
+     st.error('''Instrukcja jak korzystać z naszego ChatBota oraz w jaki sposób wygenerować klucz API dostępna jest na naszej stronie: https://langchain.github.io/.''', icon="🚨")
+
+     # Tutor information, images and descriptions.
+     col1, col2, col3 = st.columns(3)
+     with col1:
+          st.image(image=tutor_boy_img, use_column_width=True)
+          st.markdown(body="<center><b>Kolega</b></center>", unsafe_allow_html=True)
+          st.info(body=tutor_boy)
+     with col2:
+          st.image(image=tutor_girl_img, use_column_width=True)
+          st.markdown(body="<center><b>Przyjaciółka</b></center>", unsafe_allow_html=True)
+          st.info(body=tutor_girl)
+     with col3:
+          st.image(image=tutor_profesor_img, use_column_width=True)
+          st.markdown(body="<center><b>Profesor</b></center>", unsafe_allow_html=True)
+          st.info(body=tutor_profesor) 
+
+# About us.
+with st.expander(":black[O nas.]", expanded=False):
+     col1, col2, col3 = st.columns(3)
+     with col1:
+          st.markdown(body="<center><b>Norbert</b></center>", unsafe_allow_html=True)
+          st.image(image=norbert_img, use_column_width=True)
+          st.markdown(body="AI Researcher, **Data Scientist at NorthGravity**. Linkedin: https://www.linkedin.com/in/norbert-kocon/.", unsafe_allow_html=True)
+     with col2:
+          st.markdown(body="<center><b>Dagmara</b></center>", unsafe_allow_html=True)
+          st.image(image=dagmara_img, use_column_width=True)
+          st.markdown(body="Business Analyst, **CEO at AI Chat**. Linkedin: https://www.linkedin.com/in/dagmarabrocka/.", unsafe_allow_html=True)
+     with col3:
+          st.markdown(body="<center><b>Alicja</b></center>", unsafe_allow_html=True)
+          st.image(image=alicja_img, use_column_width=True)
+          st.markdown(body="Data Scientist Candidate, **Digitalisation Methods and Tools Engineer at Technip Energies**. Linkedin: https://www.linkedin.com/in/alicja-sosialuk/.", unsafe_allow_html=True)
+
+# Devider.
+st.divider()
+
+if tutor_image is not None:
+    tutor_img = tutor_image.name
+elif tutor_style == "Kolega":
+    tutor_img = tutor_boy_img
+elif tutor_style == "Przyjaciółka":
+    tutor_img = tutor_girl_img
+elif tutor_style == "Profesor":
+    tutor_img = tutor_profesor_img
+else:
+    tutor_img = None
+
+# Display the answers.
+if confirm_button is None:
+     answers = {"language": language_answer, 
+                "level": level_answer, 
+                "time": time_answer, 
+                "tutor_name": tutor_name,
+                "tutor_style": tutor_style
+                }
+else:
+    answers = {"language": language_answer, 
+                "level": level_answer, 
+                "time": time_answer, 
+                "tutor_name": tutor_name,
+                "tutor_style": tutor_style
+                }
+
+model_mapping = {
+    "GPT 3.5": "gpt-3.5-turbo",
+    "GPT 4": "gpt-4",
+}     
+
+if OPENAI_APIKEY == "":
+    st.error("Wprowadź swój klucz API. Pamiętaj, że korzystanie z Językowego AI Czatu jest płatne. Cennik dostępny jest na stronie głównej OpenAI. Link: https://platform.openai.com/overview.", icon="🚨")
+else:
+    client = OpenAI(api_key=OPENAI_APIKEY)
+    if "openai_model" not in st.session_state:
+        st.session_state["openai_model"] = model_mapping.get(llm_model, "llama2")
+
+    # Chatbot.
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    for message in st.session_state.messages:
+        if message["role"] == "assistant":
+            with st.chat_message("assistant", avatar=tutor_img):
+                st.markdown(message["content"])
+        elif message["role"] == "user":
+            with st.chat_message("user"):
+                st.markdown(message["content"])
+
+    # Reset the app.
+    if reset_button:
+        st.session_state.messages = []
+        st.rerun()
+
+    SYSTEM_PROMPT = f"""Jesteś nauczycielem języków obcych. Oto profil użytkownika z którego dowiesz się jakiego języka będziesz uczył oraz jaki jest jego poziom.
+    W jakim stylu użytownik chciałby się uczyć. Ile ma czasu na naukę. Jak ty masz na imię. Oto profil użytkownika: {answers}.
+
+    ###
+    Spróbuj wychwycić język ojczysty użytkownika na podstawie jego pierwszych wiadomości.
+
+    ###
+    Jeżeli użytkownik pyta o cokolwiek nie związanego z nauką języków obcych, to odpowiedz mu, że nie jesteś w stanie odpowiedzieć na to pytanie.
+
+    ###
+    Zapytaj użytkownika na początku czy chce zagrać w grę, która pomoże mu w nauce języka. 
+    Jeżeli użytkownik nie chce grać w grę, to przeprowadź lekcję językową i zaproponuj 3 tematy do wyboru. Oraz zawsze zapytaj użytkownika o jego ulubiony temat.
+    """
+
+    if prompt := st.chat_input("O czym dzisiaj rozmawiamy?", key="prompt"):
+        st.session_state.messages.append({"role": "system", "content": SYSTEM_PROMPT})
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        full_response = ""
+        for response in client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=[
+                {"role": m["role"], 
+                "content": m["content"]}
+                for m in st.session_state.messages
+            ],
+            stream=True,
+        ):
+            full_response += (response.choices[0].delta.content or "")
+            
+        with st.chat_message("assistant", avatar=tutor_img):
+            st.markdown(full_response)
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+            
