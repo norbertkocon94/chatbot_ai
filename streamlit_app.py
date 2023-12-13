@@ -11,27 +11,25 @@ st.sidebar.markdown("<h1><center>Językowy AI Czat 💬</center></h1>", unsafe_a
 with st.sidebar:
      language_answer    = st.selectbox("Pytanie 1: Jakiego jezyka chcesz sie uczyć?", ("Angielski", "Francuski", "Włoski"))
      level_answer       = st.selectbox("Pytanie 2: Jaki jest twoj poziom?", ("Podstawowy - A1/A2", "Sredniozaawansowany - B1/B2", "Zaawansowany - C1/C2"))
-     time_answer        = st.selectbox("Pytanie 3: Ile chcesz poświęcić dziennie na naukę?", ("5min", "10min", "15min"))
-     tutor_style        = st.selectbox("Pytanie 4: Wybierz swojego tutora.", ("Kolega", "Przyjaciółka", "Profesor"))
-     tutor_name         = st.text_input("Pytanie 5 Jak na imię ma twój nauczyciel?")
-     llm_model          = st.selectbox("Wybierz model GPT.", ("GPT 3.5", "GPT 4", "Llama 2"))
+     tutor_style        = st.selectbox("Pytanie 3: Wybierz swojego tutora.", ("Kolega", "Przyjaciółka", "Profesor"))
+     tutor_name         = st.text_input("Pytanie 4 Jak na imię ma twój nauczyciel?")
+     llm_model          = st.selectbox("Wybierz model GPT.", ("GPT 3.5", "GPT 4"))
 
      if llm_model == 'Llama 2':
           st.info("Model **Llama 2** - Open source model by Meta (Facebook). Link: https://ai.meta.com/llama/", icon="ℹ️")
      else:
           OPENAI_APIKEY = st.text_input("Wprowadź swój klucz API.", help="Klucz API jest wymagany do korzystania z Językowego AI Czatu.", type="password")
 
-     tutor_image        = st.file_uploader("Wybierz zdjęcie swojego nauczyciela.", type=["png", "jpg", "jpeg"])
+     tutor_image = st.file_uploader("Wybierz zdjęcie swojego nauczyciela.", type=["png", "jpg", "jpeg"])
      
      col1, col2 = st.columns(2)
      with col1:
-        confirm_button  = st.button("Zatwierdź", use_container_width=True, type='primary')
+        confirm_button = st.button("Zatwierdź", use_container_width=True, type='primary')
      with col2:
-        reset_button    = st.button("Resetuj", use_container_width=True)
+        reset_button = st.button("Resetuj", use_container_width=True)
 
 # Expander for more information.
 with st.expander(':rainbow[Witaj w Językowym AI Czacie! Rozwiń więcej informacji, aby poznać wszystkie szczegóły.]', expanded=False):
-     st.info('Zwróć uwagę, że w tym momencie dostępne są tylko trzy języki: angielski, francuski i włoski.', icon="ℹ️")
      st.error('''Pamiętaj, że korzystanie z Językowego AI Czatu jest **płatne**. Cennik dostępny jest na stronie głównej OpenAI. Link: https://platform.openai.com/overview.''', icon="🚨")
      st.error('''Instrukcja jak korzystać z naszego ChatBota oraz w jaki sposób wygenerować klucz API dostępna jest na naszej stronie: https://langchain.github.io/.''', icon="🚨")
 
@@ -73,10 +71,13 @@ if tutor_image is not None:
     tutor_img = tutor_image.name
 elif tutor_style == "Kolega":
     tutor_img = tutor_boy_img
+    tutor_style = tutor_boy
 elif tutor_style == "Przyjaciółka":
     tutor_img = tutor_girl_img
+    tutor_style = tutor_girl
 elif tutor_style == "Profesor":
     tutor_img = tutor_profesor_img
+    tutor_style = tutor_profesor
 else:
     tutor_img = None
 
@@ -84,14 +85,12 @@ else:
 if confirm_button is None:
      answers = {"language": language_answer, 
                 "level": level_answer, 
-                "time": time_answer, 
                 "tutor_name": tutor_name,
                 "tutor_style": tutor_style
                 }
 else:
     answers = {"language": language_answer, 
                 "level": level_answer, 
-                "time": time_answer, 
                 "tutor_name": tutor_name,
                 "tutor_style": tutor_style
                 }
@@ -125,25 +124,30 @@ else:
         st.session_state.messages = []
         st.rerun()
 
-    SYSTEM_PROMPT = f"""Jesteś nauczycielem języków obcych. Oto profil użytkownika z którego dowiesz się jakiego języka będziesz uczył oraz jaki jest jego poziom.
+    SYSTEM_PROMPT = f"""Jesteś nauczycielem języków obcych, a twój styl to: {tutor_style}. Oto profil użytkownika z którego dowiesz się jakiego języka będziesz uczył oraz jaki jest jego poziom.
     W jakim stylu użytownik chciałby się uczyć. Ile ma czasu na naukę. Jak ty masz na imię. Oto profil użytkownika: {answers}.
 
     ###
     Spróbuj wychwycić język ojczysty użytkownika na podstawie jego pierwszych wiadomości.
 
     ###
-    Jeżeli użytkownik pyta o cokolwiek nie związanego z nauką języków obcych, to odpowiedz mu, że nie jesteś w stanie odpowiedzieć na to pytanie.
+    Jeżeli użytkownik pyta o cokolwiek niezwiązanego z nauką języków obcych, to odpowiedz mu, że nie jesteś w stanie odpowiedzieć na to pytanie.
 
     ###
     Zapytaj użytkownika na początku czy chce zagrać w grę, która pomoże mu w nauce języka. 
     Jeżeli użytkownik nie chce grać w grę, to przeprowadź lekcję językową i zaproponuj 3 tematy do wyboru. Oraz zawsze zapytaj użytkownika o jego ulubiony temat.
     """
 
-    if prompt := st.chat_input("O czym dzisiaj rozmawiamy?", key="prompt"):
+    MAX_EXCHANGES = 3 # Windows size for the model.
+
+    if prompt := st.chat_input("...", key="prompt"):
         st.session_state.messages.append({"role": "system", "content": SYSTEM_PROMPT})
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
+
+        # Keep only the last MAX_EXCHANGES exchanges.
+        limited_messages = st.session_state.messages[-MAX_EXCHANGES * 2:]
 
         full_response = ""
         for response in client.chat.completions.create(
@@ -151,7 +155,7 @@ else:
             messages=[
                 {"role": m["role"], 
                 "content": m["content"]}
-                for m in st.session_state.messages
+                for m in limited_messages
             ],
             stream=True,
         ):
@@ -159,5 +163,5 @@ else:
             
         with st.chat_message("assistant", avatar=tutor_img):
             st.markdown(full_response)
+
         st.session_state.messages.append({"role": "assistant", "content": full_response})
-            
