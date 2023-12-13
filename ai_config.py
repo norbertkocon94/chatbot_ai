@@ -16,9 +16,9 @@ idealny dla tych, którzy chcą doskonalić język angielski na poziomie zaawans
 w tym naukę specjalistycznego słownictwa i struktur gramatycznych.
 '''
 
-tutor_boy_img = "Images/friend.png"
-tutor_girl_img = "Images/przyjaciolka.png"
-tutor_profesor_img = "Images/teacher.png"
-norbert_img = "Images/Norbert.png"
-dagmara_img = "Images/Dagmara.jpg"
-alicja_img = "Images/Alicja.jpg"
+tutor_boy_img = r"Images\friend.png"
+tutor_girl_img = r"Images\przyjaciolka.png"
+tutor_profesor_img = r"Images\teacher.png"
+norbert_img = r"Images\Norbert.png"
+dagmara_img = r"Images\Dagmara.png"
+alicja_img = r"Images\Alicja.png"
