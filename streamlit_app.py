@@ -29,7 +29,7 @@ with st.sidebar:
         reset_button = st.button("Resetuj", use_container_width=True)
 
 # Expander for more information.
-with st.expander(':rainbow[Witaj w Językowym AI Czacie! Rozwiń więcej informacji, aby poznać wszystkie szczegóły.]', expanded=False):
+with st.expander(':rainbow[Witaj w Językowym AI Czacie! Rozwiń więcej informacji, aby poznać wszystkie szczegóły]', expanded=False):
      st.error('''Pamiętaj, że korzystanie z Językowego AI Czatu jest **płatne**. Cennik dostępny jest na stronie głównej OpenAI. Link: https://platform.openai.com/overview.''', icon="🚨")
      st.error('''Instrukcja jak korzystać z naszego ChatBota oraz w jaki sposób wygenerować klucz API dostępna jest na naszej stronie: https://langchain.github.io/.''', icon="🚨")
 
@@ -49,21 +49,23 @@ with st.expander(':rainbow[Witaj w Językowym AI Czacie! Rozwiń więcej informa
           st.info(body=tutor_profesor) 
 
 # About us.
-with st.expander(":black[O nas.]", expanded=False):
+with st.expander(":black[O nas]", expanded=False):
      col1, col2, col3 = st.columns(3)
      with col1:
           st.markdown(body="<center><b>Norbert</b></center>", unsafe_allow_html=True)
           st.image(image=norbert_img, use_column_width=True)
-          st.markdown(body="AI Researcher, **Data Scientist at NorthGravity**. Linkedin: https://www.linkedin.com/in/norbert-kocon/.", unsafe_allow_html=True)
+          st.markdown(body="AI Researcher, **Data Scientist at NorthGravity**", unsafe_allow_html=True)
+          st.markdown(body="Linkedin https://www.linkedin.com/in/norbert-kocon/", unsafe_allow_html=True)
      with col2:
           st.markdown(body="<center><b>Dagmara</b></center>", unsafe_allow_html=True)
           st.image(image=dagmara_img, use_column_width=True)
-          st.markdown(body="Business Analyst, **CEO at AI Chat**. Linkedin: https://www.linkedin.com/in/dagmarabrocka/.", unsafe_allow_html=True)
+          st.markdown(body="Business Analyst, **CEO at AI Chat**", unsafe_allow_html=True)
+          st.markdown(body="Linkedin https://www.linkedin.com/in/dagmarabrocka/", unsafe_allow_html=True)
      with col3:
           st.markdown(body="<center><b>Alicja</b></center>", unsafe_allow_html=True)
           st.image(image=alicja_img, use_column_width=True)
-          st.markdown(body="Data Scientist Candidate, **Digitalisation Methods and Tools Engineer at Technip Energies**. Linkedin: https://www.linkedin.com/in/alicja-sosialuk/.", unsafe_allow_html=True)
-
+          st.markdown(body="Data Scientist Candidate, **Digitalisation Methods and Tools Engineer at Technip Energies**", unsafe_allow_html=True)
+          st.markdown(body="Linkedin https://www.linkedin.com/in/alicja-sosialuk/", unsafe_allow_html=True)
 # Devider.
 st.divider()
 
@@ -124,18 +126,19 @@ else:
         st.session_state.messages = []
         st.rerun()
 
-    SYSTEM_PROMPT = f"""Jesteś nauczycielem języków obcych, a twój styl to: {tutor_style}. Oto profil użytkownika z którego dowiesz się jakiego języka będziesz uczył oraz jaki jest jego poziom.
-    W jakim stylu użytownik chciałby się uczyć. Ile ma czasu na naukę. Jak ty masz na imię. Oto profil użytkownika: {answers}.
+    SYSTEM_PROMPT = f"""Jesteś nauczycielem języków obcych o stylu: {tutor_style}. 
+    Twoim zadaniem jest nauczać języka na podstawie profilu użytkownika: {answers}.
+    Profil zawiera informacje o wybranym języku, poziomie zaawansowania oraz preferencjach w nauce.
 
     ###
-    Spróbuj wychwycić język ojczysty użytkownika na podstawie jego pierwszych wiadomości.
+    Na podstawie pierwszych wiadomości użytkownika, zidentyfikuj jego język ojczysty.
 
     ###
-    Jeżeli użytkownik pyta o cokolwiek niezwiązanego z nauką języków obcych, to odpowiedz mu, że nie jesteś w stanie odpowiedzieć na to pytanie.
+    Jeśli użytkownik porusza tematy poza zakresem nauki języków, poinformuj go, że nie możesz udzielić odpowiedzi.
 
     ###
-    Zapytaj użytkownika na początku czy chce zagrać w grę, która pomoże mu w nauce języka. 
-    Jeżeli użytkownik nie chce grać w grę, to przeprowadź lekcję językową i zaproponuj 3 tematy do wyboru. Oraz zawsze zapytaj użytkownika o jego ulubiony temat.
+    Zaproponuj użytkownikowi jedną z następujących gier językowych na początku: zgadywanki słowne, krzyżówki, gra w skojarzenia, lub role-play. 
+    Te gry pomogą w nauce języka poprzez zabawę i interakcję. Jeśli użytkownik nie jest zainteresowany grą, zaproponuj trzy tematy lekcji do wyboru i zapytaj o jego ulubiony temat.
     """
 
     MAX_EXCHANGES = 3 # Windows size for the model.
