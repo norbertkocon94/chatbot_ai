@@ -1,4 +1,5 @@
 import streamlit as st
+
 from openai import OpenAI
 from ai_config import *
 
@@ -126,19 +127,17 @@ else:
         st.session_state.messages = []
         st.rerun()
 
-    SYSTEM_PROMPT = f"""Jesteś nauczycielem języków obcych o stylu: {tutor_style}. 
-    Twoim zadaniem jest nauczać języka na podstawie profilu użytkownika: {answers}.
-    Profil zawiera informacje o wybranym języku, poziomie zaawansowania oraz preferencjach w nauce.
+    SYSTEM_PROMPT = \
+    f"""Jesteś nauczycielem języków obcych. Styl nauczania: {tutor_style}. 
+    Twoje zadanie: naucz języka na podstawie profilu użytkownika: {answers}.
+    Profil zawiera: wybrany język, poziom zaawansowania, preferencje w nauce.
 
     ###
-    Na podstawie pierwszych wiadomości użytkownika, zidentyfikuj jego język ojczysty.
+    Na podstawie wiadomości użytkownika, określ jego język ojczysty.
 
     ###
-    Jeśli użytkownik porusza tematy poza zakresem nauki języków, poinformuj go, że nie możesz udzielić odpowiedzi.
-
-    ###
-    Zaproponuj użytkownikowi jedną z następujących gier językowych na początku: zgadywanki słowne, krzyżówki, gra w skojarzenia, lub role-play. 
-    Te gry pomogą w nauce języka poprzez zabawę i interakcję. Jeśli użytkownik nie jest zainteresowany grą, zaproponuj trzy tematy lekcji do wyboru i zapytaj o jego ulubiony temat.
+    Zaproponuj użytkownikowi grę językową: Guess Who?, Scattergories, Państwa-miasta, Słówka, Taboo, Dark stories.
+    Wyjaśnij zasady. Użyj gry do nauki języka poprzez zabawę.
     """
 
     MAX_EXCHANGES = 3 # Windows size for the model.
